@@ -3,6 +3,7 @@ import math
 import torch
 import torch.nn as nn
 
+
 class InputEmbedding(nn.Module):
 
     def __init__(self, d_model: int, vocab_size: int):
@@ -13,6 +14,7 @@ class InputEmbedding(nn.Module):
 
     def forward(self, x):
         return self.embedding(x) * math.sqrt(self.d_model)
+
 
 # convey positional info to the model
 class PositionalEncoding(nn.Module):
@@ -30,7 +32,7 @@ class PositionalEncoding(nn.Module):
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
-        pe = pe.unsqueeze(0) # (batch=1, seq_len, d_model)
+        pe = pe.unsqueeze(0)  # (batch=1, seq_len, d_model)
 
         # not to be trained
         self.register_buffer('pe', pe)
@@ -40,4 +42,18 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
+class LayerNormalization(nn.Module):
 
+    def __init__(self, eps: float = 10 ** -6):
+        super().__init__()
+        self.eps = eps
+        self.alpha = nn.Parameter(torch.ones(1))  # multiplied
+        self.bias = nn.Parameter(torch.zeros(1))  # added
+
+    def forward(self, x):
+        # keep dim: originally cancel the dim, but keep it
+        # from (1, 6, 512) to (1, 6, 1)
+        mean = x.mean(dim=-1, keepdim=True)
+        std = x.std(dim=-1, keepdim=True)
+
+        self.alpha * (x - mean) / (std + self.eps) + self.bias

@@ -23,7 +23,7 @@ class PositionalEncoding(nn.Module):
         super().__init__()
         self.d_model = d_model
         self.seq_len = seq_len
-        self.dropout = dropout
+        self.dropout = nn.Dropout(dropout)
 
         # create a matrix of shape (seq_len, d_model)
         pe = torch.zeros(seq_len, d_model)
@@ -56,7 +56,7 @@ class LayerNormalization(nn.Module):
         mean = x.mean(dim=-1, keepdim=True)
         std = x.std(dim=-1, keepdim=True)
 
-        self.alpha * (x - mean) / (std + self.eps) + self.bias
+        return self.alpha * (x - mean) / (std + self.eps) + self.bias
 
 
 class FeedForwardBlock(nn.Module):
@@ -70,3 +70,61 @@ class FeedForwardBlock(nn.Module):
     def forward(self, x):
         # (b, l, d_model) -> (b, l, d_ff) -> (b, l, d_model)
         return self.linear2(self.dropout(torch.relu(self.linear1(x))))
+
+
+class MultiHeadAttentionBlock(nn.Module):
+
+    def __init__(self, d_model: int, h: int, dropout: float):
+        super().__init__()
+        self.attentionScores = None
+        self.d_model = d_model
+        self.h = h
+        assert d_model % h == 0, "d_model is divisible by h"
+
+        self.d_k = d_model // h
+        self.w_q = nn.Linear(d_model, d_model)  # Wq
+        self.w_k = nn.Linear(d_model, d_model)  # Wk
+        self.w_v = nn.Linear(d_model, d_model)  # Wv
+
+        self.w_o = nn.Linear(d_model, d_model)  # Wo
+        self.dropout = nn.Dropout(dropout)
+
+    @staticmethod
+    def attention(query, key, value, mask, dropout: nn.Dropout):
+        d_k = query.shape[-1]
+
+        # (b, h, l, dk) @ (b, h, dk, l) -> (b, h, l, l)
+        attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
+        if mask is not None:
+            attention_scores = attention_scores.masked_fill(mask == 0, -1e9)
+
+        attn = attention_scores.softmax(dim=-1)
+
+        if dropout is not None:
+            attn = dropout(attn)
+
+        # (b, h, l, l) @ (b, h, l, dk) -> (b, h, l, dk)
+        return (attn @ value), attn
+
+    def forward(self, q, k, v, mask):
+        # x (b, l, d) @ (d, d) = (b, l, d)
+        query = self.w_q(q)  # (b, l, d)
+        key = self.w_k(k)  # (b, l, d)
+        value = self.w_v(v)  # (b, l, d)
+
+        # (b, l, d) -> (b, l, h, dk) -> (b, h, l, dk)
+        query = query.view(query.shape[0], query.shape[1], self.h, self.d_k).transpose(1, 2)
+        key = key.view(key.shape[0], key.shape[1], self.h, self.d_k).transpose(1, 2)
+        value = value.view(value.shape[0], value.shape[1], self.h, self.d_k).transpose(1, 2)
+
+        # (b, h, l, dk)
+        x, self.attentionScores = MultiHeadAttentionBlock.attention(query, key, value, mask, self.dropout)
+
+        # (b, h, l, dk) -> (b, l, h, dk) -> (b, l, d_model)
+        x = x.transpose(1, 2).contiguous().view(x.shape[0], x.shape[1], self.h * self.d_k)
+
+        # (b, l, d_model) @ (d_model, d_model) -> (b, l, d_model)
+        return self.w_o(x)
+
+
+

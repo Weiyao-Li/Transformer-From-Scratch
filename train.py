@@ -8,7 +8,7 @@ from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
-from torch.utils.data import random_split
+from torch.utils.data import random_split, DataLoader
 
 from dataset import BilingualDataset
 
@@ -118,3 +118,25 @@ def get_ds(config):
 
     print(f"Max source length: {max_len_src}")
     print(f"Max target length: {max_len_tgt}")
+
+    # DataLoader wraps the dataset and creates mini-batches for training
+    train_dataloader = DataLoader(
+        train_ds,
+        batch_size=config['batch_size'],
+        shuffle=True
+    )
+
+    # Validation DataLoader:
+    # batch_size=1 makes it easier to inspect individual translations
+    val_dataloader = DataLoader(
+        val_ds,
+        batch_size=1,
+        shuffle=True
+    )
+
+    # Return everything needed for training and inference:
+    # - train_dataloader: for model training
+    # - val_dataloader: for evaluation
+    # - tokenizer_src: encoder tokenizer
+    # - tokenizer_tgt: decoder tokenizer
+    return train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt

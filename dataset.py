@@ -114,18 +114,47 @@ class BilingualDataset(Dataset):
 
         return {
             "encoder_input": encoder_input,  # (seq_len)
-            "decoder_input": decoder_input,
-            # padding mask
-            "encoder_mask": (encoder_input != self.pad_token).unsqueeze(0).unsqueeze(0).int(),  # (1, 1, seq_len)
-            # padding mask + causal mask
-            "decoder_mask": (decoder_input != self.pad_token).unsqueeze(0).int()
-                            & causal_mask(decoder_input.size(0)),  # (1, seq_len) & (1, seq_len, seq_len)
+
+            "decoder_input": decoder_input,  # (seq_len)
+
+            # Encoder padding mask:
+            # 1 means "this position is a real token", 0 means "this is PAD"
+            # Shape: (1, 1, seq_len), will be broadcast to (batch, heads, query_len, key_len)
+            # Used to prevent the encoder from attending to PAD tokens.
+            "encoder_mask": (encoder_input != self.pad_token)
+            .unsqueeze(0)
+            .unsqueeze(0)
+            .int(),
+
+            # Decoder mask = padding mask AND causal mask:
+            # - Padding mask: prevents attending to PAD tokens
+            # - Causal mask: prevents attending to future tokens (look-ahead)
+            #
+            # (decoder_input != PAD) → (1, seq_len)
+            # causal_mask(seq_len)  → (1, seq_len, seq_len)
+            # After broadcasting & AND:
+            # final shape → (1, seq_len, seq_len)
+            "decoder_mask": (decoder_input != self.pad_token)
+                            .unsqueeze(0)
+                            .int()
+                            & causal_mask(decoder_input.size(0)),
+
             "label": label,  # (seq_len)
+
             "src_text": src_text,
             "tgt_text": tgt_text
         }
 
 
 def causal_mask(size):
+    # Upper triangular matrix:
+    # 1 above the diagonal, 0 on and below the diagonal
+    # Shape: (1, size, size)
     mask = torch.triu(torch.ones(1, size, size), diagonal=1).type(torch.int)
+
+    # Convert to boolean mask:
+    # True  → position is allowed (can attend)
+    # False → position is blocked (future positions)
+    #
+    # So each position i can only attend to positions <= i
     return mask == 0

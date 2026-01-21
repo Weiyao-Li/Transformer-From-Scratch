@@ -92,6 +92,8 @@ class MultiHeadAttentionBlock(nn.Module):
         # (b, h, l, dk) @ (b, h, dk, l) -> (b, h, l, l)
         attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
         if mask is not None:
+            # Set attention scores to a very large negative value (-1e9) where mask == 0,
+            # so after softmax these positions get probability 0 (used to block PAD or future tokens).
             attention_scores = attention_scores.masked_fill(mask == 0, -1e9)
 
         attn = attention_scores.softmax(dim=-1)

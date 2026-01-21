@@ -155,8 +155,13 @@ def get_model(config, vocab_src_len, vocab_tgt_len):
 
 def train_model(config):
     # Pick device: use GPU (cuda) if available, otherwise CPU
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f'using device {device}')
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+    print(f"using device {device}")
 
     # Create folder for saving checkpoints (weights/)
     Path(config['model_folder']).mkdir(parents=True, exist_ok=True)

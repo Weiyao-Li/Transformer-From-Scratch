@@ -10,6 +10,8 @@ from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
 from torch.utils.data import random_split
 
+from dataset import BilingualDataset
+
 
 def get_all_sentences(ds, lang):
     for item in ds:
@@ -58,27 +60,61 @@ def get_or_build_tokenizer(config, ds, lang):
 
 
 def get_ds(config):
-    ds_raw = load_dataset('opus_books', f'{config["lang_src"]}-{config["lang_tgt"]}', split='train')
+    # Load parallel translation dataset (source ↔ target)
+    ds_raw = load_dataset(
+        'opus_books',
+        f'{config["lang_src"]}-{config["lang_tgt"]}',
+        split='train'
+    )
 
-    # build tokenizers
+    # Build or load tokenizers:
+    # tokenizer_src → used by the encoder
+    # tokenizer_tgt → used by the decoder and labels
     tokenizer_src = get_or_build_tokenizer(config, ds_raw, config['lang_src'])
     tokenizer_tgt = get_or_build_tokenizer(config, ds_raw, config['lang_tgt'])
 
-    # keep 90% for training and 10% for validation
+    # Split dataset into train (90%) and validation (10%)
     train_ds_size = int(0.9 * len(ds_raw))
     val_ds_size = len(ds_raw) - train_ds_size
     train_ds_raw, val_ds_raw = random_split(ds_raw, [train_ds_size, val_ds_size])
 
+    # Wrap raw datasets with BilingualDataset:
+    # add special tokens, padding, and attention masks
+    train_ds = BilingualDataset(
+        train_ds_raw,
+        tokenizer_src,
+        tokenizer_tgt,
+        config['lang_src'],
+        config['lang_tgt'],
+        config['seq_len']
+    )
 
+    val_ds = BilingualDataset(
+        val_ds_raw,
+        tokenizer_src,
+        tokenizer_tgt,
+        config['lang_src'],
+        config['lang_tgt'],
+        config['seq_len']
+    )
 
+    # Compute max token length in raw data (for choosing seq_len)
+    max_len_src = 0
+    max_len_tgt = 0
 
+    for item in ds_raw:
+        # Encoder side length
+        src_ids = tokenizer_src.encode(
+            item['translation'][config['lang_src']]
+        ).ids
 
+        # Decoder side length
+        tgt_ids = tokenizer_tgt.encode(
+            item['translation'][config['lang_tgt']]
+        ).ids
 
+        max_len_src = max(max_len_src, len(src_ids))
+        max_len_tgt = max(max_len_tgt, len(tgt_ids))
 
-
-
-
-
-
-
-
+    print(f"Max source length: {max_len_src}")
+    print(f"Max target length: {max_len_tgt}")

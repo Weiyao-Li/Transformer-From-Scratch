@@ -11,6 +11,7 @@ from tokenizers.pre_tokenizers import Whitespace
 from torch.utils.data import random_split, DataLoader
 
 from dataset import BilingualDataset
+from model import build_transformer
 
 
 def get_all_sentences(ds, lang):
@@ -140,3 +141,9 @@ def get_ds(config):
     # - tokenizer_src: encoder tokenizer
     # - tokenizer_tgt: decoder tokenizer
     return train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt
+
+
+def get_model(config, vocab_src_len, vocab_tgt_len):
+    model = build_transformer(vocab_src_len, vocab_tgt_len, config['seq_len'], config['seq_len'], config['d_model'])
+
+    return model

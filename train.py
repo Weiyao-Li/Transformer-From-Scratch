@@ -297,9 +297,10 @@ def train_model(config):
     if config['preload']:
         model_filename = get_weights_file_path(config, config['preload'])
         print(f'Preloading model {model_filename}')
-        state = torch.load(model_filename)
-        initial_epoch = state['epoch'] + 1
+        state = torch.load(model_filename, map_location=device)
+        model.load_state_dict(state['model_state_dict'])
         optimizer.load_state_dict(state['optimizer_state_dict'])
+        initial_epoch = state['epoch'] + 1
         global_step = state['global_step']
 
     # Cross-entropy over vocab:
@@ -391,6 +392,7 @@ def train_model(config):
                 'global_step': global_step
             }, model_filename
         )
+    writer.close()
 
 
 if __name__ == '__main__':

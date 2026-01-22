@@ -22,11 +22,11 @@ A compact, readable Transformer (encoder-decoder) implementation, organized by m
 
 ### Metrics
 - **Train Loss Curve**
-  ![train loss](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png)
+  <img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png" width="620" />
 - **Validation CER (Character Error Rate)**
-  ![validation CER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png)
+  <img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png" width="520" />
 - **Validation WER (Word Error Rate)**
-  ![validation WER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png)
+  <img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png" width="520" />
 
 ### Attention Maps
 - **Cross-Attention Map (Decoder ↔ Encoder)**

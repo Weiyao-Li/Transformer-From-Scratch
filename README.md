@@ -20,4 +20,12 @@ A compact, readable Transformer (encoder-decoder) implementation, organized by m
 - Hardware: Google Colab (NVIDIA A100, CUDA)
 - Metrics: CER / WER / BLEU (validation)
 
-![loss curve](LOSS_CURVE_LINK)
+### Metrics
+![train loss](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png)
+![validation CER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png)
+![validation WER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png)
+
+### Attention Maps
+![cross attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/cross_attn_map.png)
+![decoder self-attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/decoder_attn_map.png)
+![encoder self-attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/encoder_attn_map.png)

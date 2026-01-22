@@ -21,12 +21,14 @@ A compact, readable Transformer (encoder-decoder) implementation, organized by m
 - Metrics: CER / WER / BLEU (validation)
 
 ### Metrics
-- **Train Loss Curve**
-  <img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png" width="520" />
-- **Validation CER (Character Error Rate)**
-  <img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png" width="520" />
-- **Validation WER (Word Error Rate)**
-  <img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png" width="520" />
+**Train Loss Curve**  
+<img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png" width="620" />
+
+**Validation CER (Character Error Rate)**  
+<img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png" width="520" />
+
+**Validation WER (Word Error Rate)**  
+<img src="https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png" width="520" />
 
 ### Attention Maps
 - **Cross-Attention Map (Decoder ↔ Encoder)**

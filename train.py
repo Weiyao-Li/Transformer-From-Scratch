@@ -6,7 +6,7 @@ import torch
 import torch.nn
 import torchmetrics
 
-from datasets import load_dataset, config, tqdm
+from datasets import load_dataset, tqdm
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizers.trainers import WordLevelTrainer
@@ -14,6 +14,7 @@ from tokenizers.pre_tokenizers import Whitespace
 from torch import nn
 from torch.utils.data import random_split, DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torchmetrics.text import BLEUScore
 
 from config import get_weights_file_path, get_config
 from dataset import BilingualDataset, causal_mask
@@ -119,10 +120,10 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
         writer.flush()
 
         # Compute the BLEU metric
-        metric = torchmetrics.BLEUScore()
-        bleu = metric(predicted, expected)
+        metric = BLEUScore(n_gram=4)
+        targets = [[t] for t in expected]
+        bleu = metric(predicted, targets)
         writer.add_scalar('validation BLEU', bleu, global_step)
-        writer.flush()
 
 
 def get_all_sentences(ds, lang):

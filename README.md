@@ -21,11 +21,17 @@ A compact, readable Transformer (encoder-decoder) implementation, organized by m
 - Metrics: CER / WER / BLEU (validation)
 
 ### Metrics
-![train loss](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png)
-![validation CER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png)
-![validation WER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png)
+- **Train Loss Curve**
+  ![train loss](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/train_loss.png)
+- **Validation CER (Character Error Rate)**
+  ![validation CER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20CER.png)
+- **Validation WER (Word Error Rate)**
+  ![validation WER](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/metrics/validation%20WER.png)
 
 ### Attention Maps
-![cross attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/cross_attn_map.png)
-![decoder self-attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/decoder_attn_map.png)
-![encoder self-attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/encoder_attn_map.png)
+- **Cross-Attention Map (Decoder ↔ Encoder)**
+  ![cross attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/cross_attn_map.png)
+- **Decoder Self-Attention Map**
+  ![decoder self-attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/decoder_attn_map.png)
+- **Encoder Self-Attention Map**
+  ![encoder self-attention map](https://github.com/Weiyao-Li/Transformer-From-Scratch/blob/main/attn_maps/encoder_attn_map.png)
